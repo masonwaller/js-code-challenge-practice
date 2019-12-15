@@ -1,0 +1,5 @@
+To install the server run:
+    sudo npm install -g json-server 
+
+To start the server run:
+    json-server --watch db.json
