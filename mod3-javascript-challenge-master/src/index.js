@@ -28,23 +28,46 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function likeImg(dataInput) {
-    let oldCount = dataInput.like_count
-    let newCount = oldCount + 1;
-    likeElement.innerText = `${newCount}`
+    event.preventDefault()
     let data = {
-      image_id: 4131,
-      like_count: newCount
+      image_id: 4131
     }
+    
     let configObject = {
       method: 'post',
-      body: JSON.stringify(data)
-    };
-
+      body: JSON.stringify(data),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    } 
+    }
     fetch('https://randopic.herokuapp.com/likes', configObject)
-      .then(resp => resp.JSON())
-      .then(respData => {
-        console.log(respData)
+      .then(resp => resp.json())
+      .then(data => {
+        let oldCount = dataInput.like_count
+        let newCount = parseInt(oldCount, 10) + 1;
+        likeElement.innerText = `${newCount}`
       })
+
+      // likeElement.innerText = `${dataInput.like_count}`
+    
+    // let oldCount = dataInput.like_count
+    // let newCount = parseInt(oldCount, 10) + 1;
+    // likeElement.innerText = `${newCount}`
+    // let data = {
+    //   image_id: 4131
+    // }
+    
+    // let configObject = {
+    //   method: 'post',
+    //   body: JSON.stringify(data),
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     'Accept': 'application/json'
+    // } 
+    // }
+    // fetch('https://randopic.herokuapp.com/likes', configObject)
+    // likeElement.innerText = `${dataInput.like_count}`
   }
 
   
