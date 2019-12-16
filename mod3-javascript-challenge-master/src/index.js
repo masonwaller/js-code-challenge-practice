@@ -3,74 +3,56 @@ document.addEventListener('DOMContentLoaded', () => {
   const imgUrl = "https://randopic.herokuapp.com/images/4131"
   const likeElement = document.getElementById('likes');
   const likeButton = document.getElementById('like_button');
-  let imgData;
+  const addComment = document.getElementById("comment_form");
+  let imgId = 4131;
 
-  function getImgData() {
-    fetch(imgUrl)
-    .then(response => response.json())
-    .then(data=> {
-      imgData = data
-      displayImgData(imgData);
-      displayImgLikes(imgData)
+  fetch(imgUrl).then(res => res.json()).then(res => displayImg(res))
+
+  function displayImg(res) {
+    let img = document.getElementById("image")
+    let title = document.getElementById("name")
+    let com = document.getElementById("comments")
+
+    img.src = res.url
+    title.innerText = res.name
+    likeElement.innerText = res.like_count
+
+    res.comments.forEach(coment => {
+      let comm = document.createElement("li")
+      comm.innerText = coment.content
+      com.appendChild(comm)
     })
   }
-
-  function displayImgData(data){
-    let image = document.querySelector('img');
-    image.src = `${data.url}`
-    let name = document.getElementById("name")
-    name.innerText= `${data.name}`
-  }
-
-  function displayImgLikes(data){
-    likeElement.innerText= data.like_count;
-    likeButton.addEventListener("click", () => likeImg(data))
-  }
-
-  function likeImg(dataInput) {
+  likeButton.addEventListener("click", (event) => {
     event.preventDefault()
-    let data = {
-      image_id: 4131
-    }
+    let like = parseInt(likeElement.innerText) + 1
+    likeElement.innerText = like
     
-    let configObject = {
-      method: 'post',
-      body: JSON.stringify(data),
+    fetch(`https://randopic.herokuapp.com/likes/`, {
+      method: "post",
       headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-    } 
-    }
-    fetch('https://randopic.herokuapp.com/likes', configObject)
-      .then(resp => resp.json())
-      .then(data => {
-        let oldCount = dataInput.like_count
-        let newCount = parseInt(oldCount, 10) + 1;
-        likeElement.innerText = `${newCount}`
-      })
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify({like_count: like, image_id: imgId}) })
 
-      // likeElement.innerText = `${dataInput.like_count}`
-    
-    // let oldCount = dataInput.like_count
-    // let newCount = parseInt(oldCount, 10) + 1;
-    // likeElement.innerText = `${newCount}`
-    // let data = {
-    //   image_id: 4131
-    // }
-    
-    // let configObject = {
-    //   method: 'post',
-    //   body: JSON.stringify(data),
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     'Accept': 'application/json'
-    // } 
-    // }
-    // fetch('https://randopic.herokuapp.com/likes', configObject)
-    // likeElement.innerText = `${dataInput.like_count}`
-  }
+  })
 
-  
+  addComment.addEventListener("submit", (event) => {
+    event.preventDefault()
+    let comment = document.querySelector("input[name=comment]").value;
+    let comm = document.createElement("li")
+    let com = document.getElementById("comments")
+    comm.innerText = comment
+    com.appendChild(comm)
 
-  getImgData()
+    fetch(`https://randopic.herokuapp.com/comments/`, {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify({content: comment, image_id: imgId}) })
+  })
+
 })
